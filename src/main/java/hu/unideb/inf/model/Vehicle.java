@@ -1,4 +1,6 @@
 package hu.unideb.inf.model;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Vehicle {
     private final String id;
@@ -53,5 +55,17 @@ public class Vehicle {
                 this.position = new Position(this.position.x(), this.position.y() + 1);
             }
         }
+    }
+
+    public List<Position> getOccupiedPositions() {
+        List<Position> occupied = new ArrayList<>();
+        for (int i = 0; i < length; i++) {
+            if (orientation == Orientation.HORIZONTAL) {
+                occupied.add(new Position(this.position.x() + i, this.position.y()));
+            } else {
+                occupied.add(new Position(this.position.x(), this.position.y() + i));
+            }
+        }
+        return occupied;
     }
 }
