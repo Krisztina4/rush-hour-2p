@@ -37,4 +37,43 @@ class BoardTest {
             board.addVehicle(vehicle2);
         });
     }
+
+    @Test
+    void testMoveVehicleSuccessfully() {
+        Board board = new Board(6);
+        Vehicle vehicle = new Vehicle("A", 2, Orientation.HORIZONTAL, new Position(0, 0));
+        board.addVehicle(vehicle);
+
+        board.moveVehicle("A", Direction.RIGHT);
+
+        assertEquals(new Position(1, 0), board.getVehicle("A").getPosition());
+    }
+
+    @Test
+    void testMoveVehicleOutOfBoundsRollsBack() {
+        Board board = new Board(6);
+        Vehicle vehicle = new Vehicle("A", 2, Orientation.HORIZONTAL, new Position(4, 0));
+        board.addVehicle(vehicle);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            board.moveVehicle("A", Direction.RIGHT);
+        });
+
+        assertEquals(new Position(4, 0), board.getVehicle("A").getPosition());
+    }
+
+    @Test
+    void testMoveVehicleCollisionRollsBack() {
+        Board board = new Board(6);
+        Vehicle vehicle1 = new Vehicle("A", 2, Orientation.HORIZONTAL, new Position(0, 0));
+        Vehicle vehicle2 = new Vehicle("B", 2, Orientation.VERTICAL, new Position(2, 0));
+        board.addVehicle(vehicle1);
+        board.addVehicle(vehicle2);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            board.moveVehicle("A", Direction.RIGHT);
+        });
+
+        assertEquals(new Position(0, 0), board.getVehicle("A").getPosition());
+    }
 }
