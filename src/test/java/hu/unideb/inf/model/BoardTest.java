@@ -76,4 +76,22 @@ class BoardTest {
 
         assertEquals(new Position(0, 0), board.getVehicle("A").getPosition());
     }
+
+    @Test
+    void testIsSolvedReturnsTrueWhenTargetAtEdge() {
+        Board board = new Board(6);
+        Vehicle target = new Vehicle("RED", 2, Orientation.HORIZONTAL, new Position(4, 2));
+        board.addVehicle(target);
+
+        assertTrue(board.isSolved("RED"));
+    }
+
+    @Test
+    void testIsSolvedReturnsFalseWhenTargetNotAtEdge() {
+        Board board = new Board(6);
+        Vehicle target = new Vehicle("RED", 2, Orientation.HORIZONTAL, new Position(3, 2));
+        board.addVehicle(target);
+
+        assertFalse(board.isSolved("RED"));
+    }
 }

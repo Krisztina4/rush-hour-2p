@@ -76,4 +76,15 @@ public class Board {
             throw new IllegalArgumentException(errorMessage);
         }
     }
+
+    public boolean isSolved(String targetVehicleId) {
+        Vehicle target = getVehicle(targetVehicleId);
+
+        for (Position p : target.getOccupiedPositions()) {
+            if (p.x() == size - 1) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
