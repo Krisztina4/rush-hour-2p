@@ -1,14 +1,3 @@
-# Java kompilettek és osztályfájlok
-*.class
-
-# IDE (fejlesztőkörnyezet) saját mappák
+target/
 .idea/
 *.iml
-.vscode/
-bin/
-out/
-
-# H2 adatbázis lokális fájljai, amiket a program generál majd
-rushhour_data/
-*.mv.db
-*.trace.db
