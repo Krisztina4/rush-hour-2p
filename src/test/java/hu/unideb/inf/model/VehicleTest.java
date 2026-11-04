@@ -45,4 +45,13 @@ class VehicleTest {
         assertEquals(expected, vehicle.getOccupiedPositions());
     }
 
+    @Test
+    void testHorizontalVehicleMovesMultipleSteps() {
+        Vehicle vehicle = new Vehicle("A", 2, Orientation.HORIZONTAL, new Position(1, 1));
+        vehicle.move(Direction.RIGHT, 3);
+
+        Position expectedPosition = new Position(4, 1);
+        assertEquals(expectedPosition, vehicle.getPosition());
+    }
+
 }

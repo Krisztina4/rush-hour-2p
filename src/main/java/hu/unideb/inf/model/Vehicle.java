@@ -35,26 +35,33 @@ public class Vehicle {
         this.position = position;
     }
 
-    public void move(Direction direction) {
+    public void move(Direction direction, int distance) {
+        if (distance <= 0) {
+            throw new IllegalArgumentException("A lépéstávolságnak legalább 1-nek kell lennie.");
+        }
         if (this.orientation == Orientation.HORIZONTAL) {
             if (direction == Direction.UP || direction == Direction.DOWN) {
                 throw new IllegalArgumentException("Vízszintes jármű nem mozoghat fel vagy le.");
             }
             if (direction == Direction.LEFT) {
-                this.position = new Position(this.position.x() - 1, this.position.y());
+                this.position = new Position(this.position.x() - distance, this.position.y());
             } else if (direction == Direction.RIGHT) {
-                this.position = new Position(this.position.x() + 1, this.position.y());
+                this.position = new Position(this.position.x() + distance, this.position.y());
             }
         } else if (this.orientation == Orientation.VERTICAL) {
             if (direction == Direction.LEFT || direction == Direction.RIGHT) {
                 throw new IllegalArgumentException("Függőleges jármű nem mozoghat balra vagy jobbra.");
             }
             if (direction == Direction.UP) {
-                this.position = new Position(this.position.x(), this.position.y() - 1);
+                this.position = new Position(this.position.x(), this.position.y() - distance);
             } else if (direction == Direction.DOWN) {
-                this.position = new Position(this.position.x(), this.position.y() + 1);
+                this.position = new Position(this.position.x(), this.position.y() + distance);
             }
         }
+    }
+
+    public void move(Direction direction) {
+        move(direction, 1);
     }
 
     public List<Position> getOccupiedPositions() {
