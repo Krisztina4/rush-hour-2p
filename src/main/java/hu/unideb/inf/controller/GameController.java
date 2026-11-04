@@ -11,25 +11,39 @@ public class GameController {
     private final Board board;
     private final ConsoleView view;
     private final GameResultRepository repository;
-    private final String targetVehicleId;
+    private final String targetVehicleId1;
+    private final String targetVehicleId2;
 
-    public GameController(Board board, ConsoleView view, GameResultRepository repository, String targetVehicleId) {
+    public GameController(Board board, ConsoleView view, GameResultRepository repository,
+                          String targetVehicleId1, String targetVehicleId2) {
         this.board = board;
         this.view = view;
         this.repository = repository;
-        this.targetVehicleId = targetVehicleId;
+        this.targetVehicleId1 = targetVehicleId1;
+        this.targetVehicleId2 = targetVehicleId2;
     }
 
     public void play() {
-        String playerName = view.readString("Kérem a játékos nevét");
-        int steps = 0;
+        String player1Name = view.readString("Kérem az 1. játékos nevét");
+        String player2Name = view.readString("Kérem a 2. játékos nevét");
 
-        while (!board.isSolved(targetVehicleId)) {
+        int player1Steps = 0;
+        int player2Steps = 0;
+        int currentPlayer = 1;
+
+        while (true) {
+            String activePlayerName = (currentPlayer == 1) ? player1Name : player2Name;
+            String activeTargetId = (currentPlayer == 1) ? targetVehicleId1 : targetVehicleId2;
+
+            view.printMessage("\n========================================");
+            view.printMessage("Soron következik: " + activePlayerName + " (Céljárműved: " + activeTargetId + ")");
+            view.printMessage("========================================");
             view.printBoard(board);
-            String input = view.readString("Lépés (pl. 'R R' -> R jármű jobbra, irányok: U, D, L, R) vagy 'exit'");
+
+            String input = view.readString("Lépés (pl. '" + activeTargetId + " R') vagy 'exit'");
 
             if (input.equalsIgnoreCase("exit")) {
-                view.printMessage("Játék megszakítva.");
+                view.printMessage("A játékot megszakították.");
                 return;
             }
 
@@ -49,17 +63,29 @@ public class GameController {
 
             try {
                 board.moveVehicle(vehicleId, direction);
-                steps++;
+
+                if (currentPlayer == 1) {
+                    player1Steps++;
+                } else {
+                    player2Steps++;
+                }
+
+                if (board.isSolved(activeTargetId)) {
+                    int finalSteps = (currentPlayer == 1) ? player1Steps : player2Steps;
+                    view.printBoard(board);
+                    view.printMessage("GYŐZELEM! " + activePlayerName + " megnyerte a játékot " + finalSteps + " lépésből!");
+
+                    repository.saveResult(new GameResult(activePlayerName, finalSteps));
+                    view.printTopResults(repository.getTopResults(5));
+                    break;
+                }
+
+                currentPlayer = (currentPlayer == 1) ? 2 : 1;
+
             } catch (IllegalArgumentException e) {
-                view.printMessage("Hiba: " + e.getMessage());
+                view.printMessage("Hiba: " + e.getMessage() + " Újra te lépsz!");
             }
         }
-
-        view.printBoard(board);
-        view.printMessage("Győzelem! " + playerName + " megoldotta " + steps + " lépésből.");
-
-        repository.saveResult(new GameResult(playerName, steps));
-        view.printTopResults(repository.getTopResults(5));
     }
 
     private Direction parseDirection(String input) {
