@@ -94,4 +94,32 @@ class BoardTest {
 
         assertFalse(board.isSolved("RED"));
     }
+
+    @Test
+    void testMoveVehicleMultipleStepsSuccessfully() {
+        Board board = new Board(6);
+        Vehicle vehicle = new Vehicle("A", 2, Orientation.HORIZONTAL, new Position(0, 0));
+        board.addVehicle(vehicle);
+
+        board.moveVehicle("A", Direction.RIGHT, 3);
+
+        assertEquals(new Position(3, 0), board.getVehicle("A").getPosition());
+    }
+
+    @Test
+    void testMoveVehicleJumpingOverVehicleThrowsExceptionAndRollsBack() {
+        Board board = new Board(6);
+        Vehicle vehicle1 = new Vehicle("A", 2, Orientation.HORIZONTAL, new Position(0, 0));
+        Vehicle vehicle2 = new Vehicle("B", 2, Orientation.VERTICAL, new Position(2, 0));
+        board.addVehicle(vehicle1);
+        board.addVehicle(vehicle2);
+
+        // Az "A" jármű próbál 3-at lépni jobbra, de a (2,0) pozícióban ott áll a "B"
+        assertThrows(IllegalArgumentException.class, () -> {
+            board.moveVehicle("A", Direction.RIGHT, 3);
+        });
+
+        // Ellenőrizzük a rollbacket: az "A" jármű az eredeti (0,0) pozícióban marad
+        assertEquals(new Position(0, 0), board.getVehicle("A").getPosition());
+    }
 }

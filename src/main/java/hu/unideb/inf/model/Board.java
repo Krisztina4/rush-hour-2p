@@ -46,35 +46,36 @@ public class Board {
         throw new IllegalArgumentException("Nincs ilyen azonosítójú jármű a táblán.");
     }
 
-    public void moveVehicle(String id, Direction direction) {
+    public void moveVehicle(String id, Direction direction, int distance) {
+        if (distance <= 0) {
+            throw new IllegalArgumentException("A lépéstávolságnak legalább 1-nek kell lennie.");
+        }
+
         Vehicle vehicle = getVehicle(id);
         Position originalPosition = vehicle.getPosition();
 
-        vehicle.move(direction);
+        for (int step = 1; step <= distance; step++) {
+            vehicle.setPosition(originalPosition);
+            vehicle.move(direction, step);
 
-        boolean valid = true;
-        String errorMessage = "";
+            for (Position p : vehicle.getOccupiedPositions()) {
+                if (p.x() < 0 || p.x() >= size || p.y() < 0 || p.y() >= size) {
+                    vehicle.setPosition(originalPosition);
+                    throw new IllegalArgumentException("Érvénytelen lépés: A jármű útközben kilógna a pályáról.");
+                }
 
-        for (Position p : vehicle.getOccupiedPositions()) {
-            if (p.x() < 0 || p.x() >= size || p.y() < 0 || p.y() >= size) {
-                valid = false;
-                errorMessage = "Érvénytelen lépés: A jármű kilóg a pályáról.";
-                break;
-            }
-
-            for (Vehicle other : vehicles) {
-                if (other != vehicle && other.getOccupiedPositions().contains(p)) {
-                    valid = false;
-                    errorMessage = "Érvénytelen lépés: A jármű ütközik egy másikkal.";
-                    break;
+                for (Vehicle other : vehicles) {
+                    if (other != vehicle && other.getOccupiedPositions().contains(p)) {
+                        vehicle.setPosition(originalPosition);
+                        throw new IllegalArgumentException("Érvénytelen lépés: A jármű útközben ütközne egy másikkal.");
+                    }
                 }
             }
         }
+    }
 
-        if (!valid) {
-            vehicle.setPosition(originalPosition);
-            throw new IllegalArgumentException(errorMessage);
-        }
+    public void moveVehicle(String id, Direction direction) {
+        moveVehicle(id, direction, 1);
     }
 
     public boolean isSolved(String targetVehicleId) {
