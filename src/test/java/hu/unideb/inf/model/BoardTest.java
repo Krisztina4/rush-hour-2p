@@ -122,4 +122,15 @@ class BoardTest {
         // Ellenőrizzük a rollbacket: az "A" jármű az eredeti (0,0) pozícióban marad
         assertEquals(new Position(0, 0), board.getVehicle("A").getPosition());
     }
+
+    @Test
+    void testGetVehicleIsCaseInsensitive() {
+        Board board = new Board(6);
+        Vehicle vehicle = new Vehicle("X", 2, Orientation.HORIZONTAL, new Position(0, 0));
+        board.addVehicle(vehicle);
+
+        Vehicle found = board.getVehicle("x");
+
+        assertEquals("X", found.getId());
+    }
 }

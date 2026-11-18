@@ -39,7 +39,7 @@ public class Board {
 
     public Vehicle getVehicle(String id) {
         for (Vehicle v : vehicles) {
-            if (v.getId().equals(id)) {
+            if (v.getId().equalsIgnoreCase(id)) {
                 return v;
             }
         }
