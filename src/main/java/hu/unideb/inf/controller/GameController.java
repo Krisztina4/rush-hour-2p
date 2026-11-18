@@ -40,21 +40,31 @@ public class GameController {
             view.printMessage("========================================");
             view.printBoard(board);
 
-            String input = view.readString("Lépés (pl. '" + activeTargetId + " R') vagy 'exit'");
+            String input = view.readString("Lépés (pl. '" + activeTargetId + " R' vagy '" + activeTargetId + " R 2') vagy 'exit'");
 
             if (input.equalsIgnoreCase("exit")) {
                 view.printMessage("A játékot megszakították.");
                 return;
             }
 
-            String[] parts = input.split(" ");
-            if (parts.length != 2) {
-                view.printMessage("Hibás formátum! Használat: <JárműID> <Irány>");
+            String[] parts = input.split("\\s+");
+            if (parts.length < 2 || parts.length > 3) {
+                view.printMessage("Hibás formátum! Használat: <JárműID> <Irány> [Távolság]");
                 continue;
             }
 
             String vehicleId = parts[0];
             Direction direction = parseDirection(parts[1]);
+            int distance = 1;
+
+            if (parts.length == 3) {
+                try {
+                    distance = Integer.parseInt(parts[2]);
+                } catch (NumberFormatException e) {
+                    view.printMessage("Hibás lépéstávolság! Pozitív egész számot adj meg.");
+                    continue;
+                }
+            }
 
             if (direction == null) {
                 view.printMessage("Hibás irány! Engedélyezett: U (fel), D (le), L (bal), R (jobb).");
@@ -62,7 +72,7 @@ public class GameController {
             }
 
             try {
-                board.moveVehicle(vehicleId, direction);
+                board.moveVehicle(vehicleId, direction, distance);
 
                 if (currentPlayer == 1) {
                     player1Steps++;
